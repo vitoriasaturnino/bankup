@@ -45,10 +45,13 @@ defmodule BankupWeb.ClientControllerTest do
     setup [:create_client]
 
     test "updates and renders client when data is valid", %{conn: conn, client: client} do
-      conn =
-        put(conn, ~p"/api/clients/#{client.id}", client: %{@valid_attrs | full_name: "Jane Doe"})
+      client_id = client.id
 
-      assert %{"id" => ^client.id, "full_name" => "Jane Doe"} = json_response(conn, 200)["data"]
+      conn =
+        put(conn, ~p"/api/clients/#{client_id}", client: @valid_attrs)
+
+      response = json_response(conn, 200)["data"]
+      assert %{"id" => ^client_id, "full_name" => "Jane Doe"} = response
     end
 
     test "does not update client and renders errors when data is invalid", %{

@@ -62,13 +62,15 @@ defmodule BankupWeb.PaymentControllerTest do
     setup [:create_payment]
 
     test "updates and renders payment when data is valid", %{conn: conn, payment: payment} do
+      payment_id = payment.id
+
       conn =
-        put(conn, ~p"/api/payments/#{payment.id}",
+        put(conn, ~p"/api/payments/#{payment_id}",
           payment: %{@valid_attrs | payment_status: "pendente"}
         )
 
-      assert %{"id" => ^payment.id, "payment_status" => "pendente"} =
-               json_response(conn, 200)["data"]
+      response = json_response(conn, 200)["data"]
+      assert %{"id" => ^payment_id, "payment_status" => "pendente"} = response
     end
 
     test "does not update payment and renders errors when data is invalid", %{

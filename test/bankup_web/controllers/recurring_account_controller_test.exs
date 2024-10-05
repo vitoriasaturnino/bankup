@@ -69,12 +69,15 @@ defmodule BankupWeb.RecurringAccountControllerTest do
       conn: conn,
       recurring_account: account
     } do
+      account_id = account.id
+
       conn =
-        put(conn, ~p"/api/recurring_accounts/#{account.id}",
+        put(conn, ~p"/api/recurring_accounts/#{account_id}",
           recurring_account: %{@valid_attrs | description: "Luz"}
         )
 
-      assert %{"id" => ^account.id, "description" => "Luz"} = json_response(conn, 200)["data"]
+      response = json_response(conn, 200)["data"]
+      assert %{"id" => ^account_id, "description" => "Luz"} = response
     end
 
     test "does not update recurring account and renders errors when data is invalid", %{
