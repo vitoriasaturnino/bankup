@@ -3,6 +3,7 @@ defmodule BankupWeb.RecurringAccountController do
 
   alias Bankup.RecurringAccounts
   alias Bankup.RecurringAccounts.RecurringAccount
+  alias Bankup.Notifications.{EmailNotifier, WhatsAppNotifier}
 
   action_fallback BankupWeb.FallbackController
 
@@ -14,6 +15,13 @@ defmodule BankupWeb.RecurringAccountController do
   def create(conn, %{"recurring_account" => account_params}) do
     with {:ok, %RecurringAccount{} = account} <-
            RecurringAccounts.create_recurring_account(account_params) do
+      EmailNotifier.send_payment_notification(account.client.email, account)
+
+      WhatsAppNotifier.send_whatsapp_message(
+        account.client.whatsapp,
+        "Recurring account created: #{account.description}"
+      )
+
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/recurring_accounts/#{account.id}")
