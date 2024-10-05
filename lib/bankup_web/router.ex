@@ -9,6 +9,16 @@ defmodule BankupWeb.Router do
     pipe_through :api
   end
 
+  scope "/api", BankupWeb do
+    pipe_through :api
+
+    resources "/clients", ClientController, except: [:new, :edit]
+    resources "/recurring_accounts", RecurringAccountController, except: [:new, :edit]
+    resources "/payments", PaymentController, except: [:new, :edit]
+    resources "/notifications", NotificationController, except: [:new, :edit]
+    resources "/settings", SettingController, except: [:new, :edit]
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:bankup, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
