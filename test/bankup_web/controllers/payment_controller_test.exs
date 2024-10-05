@@ -1,6 +1,9 @@
 defmodule BankupWeb.PaymentControllerTest do
   use BankupWeb.ConnCase
 
+  import Mox
+  setup :verify_on_exit!
+
   alias Bankup.Payments
   alias Bankup.Payments.Payment
 
@@ -39,6 +42,19 @@ defmodule BankupWeb.PaymentControllerTest do
     test "does not create payment and renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, ~p"/api/payments", payment: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "creates payment and sends notifications", %{conn: conn, recurring_account: account} do
+      expect(EmailNotifierMock, :send_payment_notification, fn _email, _payment -> :ok end)
+      expect(WhatsAppNotifierMock, :send_whatsapp_message, fn _phone, _message -> :ok end)
+
+      conn =
+        post(conn, ~p"/api/payments", payment: Map.put(@valid_attrs, :account_id, account.id))
+
+      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      conn = get(conn, ~p"/api/payments/#{id}")
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
     end
   end
 

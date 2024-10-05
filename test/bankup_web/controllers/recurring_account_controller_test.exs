@@ -1,6 +1,9 @@
 defmodule BankupWeb.RecurringAccountControllerTest do
   use BankupWeb.ConnCase
 
+  import Mox
+  setup :verify_on_exit!
+
   alias Bankup.RecurringAccounts
   alias Bankup.RecurringAccounts.RecurringAccount
 
@@ -41,6 +44,21 @@ defmodule BankupWeb.RecurringAccountControllerTest do
     } do
       conn = post(conn, ~p"/api/recurring_accounts", recurring_account: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "creates recurring account and sends notifications", %{conn: conn, client: client} do
+      expect(EmailNotifierMock, :send_payment_notification, fn _email, _account -> :ok end)
+      expect(WhatsAppNotifierMock, :send_whatsapp_message, fn _phone, _message -> :ok end)
+
+      conn =
+        post(conn, ~p"/api/recurring_accounts",
+          recurring_account: Map.put(@valid_attrs, :client_id, client.id)
+        )
+
+      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      conn = get(conn, ~p"/api/recurring_accounts/#{id}")
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
     end
   end
 
