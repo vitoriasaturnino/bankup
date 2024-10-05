@@ -13,13 +13,16 @@ defmodule BankupWeb.PaymentController do
   end
 
   def create(conn, %{"payment" => payment_params}) do
-    with {:ok, %Payment{} = payment} <- Payments.create_payment(payment_params) do
-      # Enviar notificações mockadas
-      EmailNotifier.send_payment_notification(payment.account.client.email, payment)
+    with {:ok, %Payment{} = payment} <- Payments.create_payment(payment_params),
+         # Carregar a associação account e client
+         payment <- Bankup.Repo.preload(payment, account: [:client]) do
+      client = payment.account.client
+
+      EmailNotifier.send_payment_notification(client.email, payment)
 
       WhatsAppNotifier.send_whatsapp_message(
-        payment.account.client.whatsapp,
-        "Payment received: #{payment.amount_paid}"
+        client.whatsapp,
+        "Payment created for account: #{payment.account.description}"
       )
 
       conn

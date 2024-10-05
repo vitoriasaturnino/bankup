@@ -14,11 +14,15 @@ defmodule BankupWeb.RecurringAccountController do
 
   def create(conn, %{"recurring_account" => account_params}) do
     with {:ok, %RecurringAccount{} = account} <-
-           RecurringAccounts.create_recurring_account(account_params) do
-      EmailNotifier.send_payment_notification(account.client.email, account)
+           RecurringAccounts.create_recurring_account(account_params),
+         # Carregar a associação client
+         account <- Bankup.Repo.preload(account, :client) do
+      client = account.client
+
+      EmailNotifier.send_payment_notification(client.email, account)
 
       WhatsAppNotifier.send_whatsapp_message(
-        account.client.whatsapp,
+        client.whatsapp,
         "Recurring account created: #{account.description}"
       )
 
