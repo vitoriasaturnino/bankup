@@ -3,21 +3,22 @@ defmodule Bankup.RecurringAccounts.RecurringAccount do
   import Ecto.Changeset
 
   schema "recurring_accounts" do
-    field :status, :string
     field :description, :string
     field :amount, :decimal
     field :due_date, :date
     field :payee, :string
     field :pix_key, :string
-    field :client_id, :id
+    field :status, :string
 
-    timestamps(type: :utc_datetime)
+    # Definindo a associação com Client
+    belongs_to :client, Bankup.Clients.Client
+
+    timestamps()
   end
 
-  @doc false
-  def changeset(recurring_account, attrs) do
-    recurring_account
-    |> cast(attrs, [:description, :amount, :due_date, :payee, :pix_key, :status])
-    |> validate_required([:description, :amount, :due_date, :payee, :pix_key, :status])
+  def changeset(account, attrs) do
+    account
+    |> cast(attrs, [:description, :amount, :due_date, :payee, :pix_key, :status, :client_id])
+    |> validate_required([:description, :amount, :due_date, :payee, :pix_key, :status, :client_id])
   end
 end

@@ -2,6 +2,7 @@ defmodule Bankup.Clients.Client do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, except: [:__meta__]}
   schema "clients" do
     field :state, :string
     field :full_name, :string

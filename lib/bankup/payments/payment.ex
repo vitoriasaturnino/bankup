@@ -8,15 +8,28 @@ defmodule Bankup.Payments.Payment do
     field :payment_method, :string
     field :payment_status, :string
     field :penalty_applied, :decimal
-    field :account_id, :id
 
-    timestamps(type: :utc_datetime)
+    belongs_to :account, Bankup.RecurringAccounts.RecurringAccount
+
+    timestamps()
   end
 
-  @doc false
   def changeset(payment, attrs) do
     payment
-    |> cast(attrs, [:amount_paid, :payment_date, :payment_method, :payment_status, :penalty_applied])
-    |> validate_required([:amount_paid, :payment_date, :payment_method, :payment_status, :penalty_applied])
+    |> cast(attrs, [
+      :amount_paid,
+      :payment_date,
+      :payment_method,
+      :payment_status,
+      :penalty_applied,
+      :account_id
+    ])
+    |> validate_required([
+      :amount_paid,
+      :payment_date,
+      :payment_method,
+      :payment_status,
+      :account_id
+    ])
   end
 end
