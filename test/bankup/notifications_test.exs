@@ -21,9 +21,16 @@ defmodule Bankup.NotificationsTest do
     end
 
     test "create_notification/1 with valid data creates a notification" do
-      valid_attrs = %{channel: "some channel", content: "some content", sent_at: ~U[2024-11-01 18:18:00Z], delivery_status: "some delivery_status"}
+      valid_attrs = %{
+        channel: "some channel",
+        content: "some content",
+        sent_at: ~U[2024-11-01 18:18:00Z],
+        delivery_status: "some delivery_status"
+      }
 
-      assert {:ok, %Notification{} = notification} = Notifications.create_notification(valid_attrs)
+      assert {:ok, %Notification{} = notification} =
+               Notifications.create_notification(valid_attrs)
+
       assert notification.channel == "some channel"
       assert notification.content == "some content"
       assert notification.sent_at == ~U[2024-11-01 18:18:00Z]
@@ -36,9 +43,17 @@ defmodule Bankup.NotificationsTest do
 
     test "update_notification/2 with valid data updates the notification" do
       notification = notification_fixture()
-      update_attrs = %{channel: "some updated channel", content: "some updated content", sent_at: ~U[2024-11-02 18:18:00Z], delivery_status: "some updated delivery_status"}
 
-      assert {:ok, %Notification{} = notification} = Notifications.update_notification(notification, update_attrs)
+      update_attrs = %{
+        channel: "some updated channel",
+        content: "some updated content",
+        sent_at: ~U[2024-11-02 18:18:00Z],
+        delivery_status: "some updated delivery_status"
+      }
+
+      assert {:ok, %Notification{} = notification} =
+               Notifications.update_notification(notification, update_attrs)
+
       assert notification.channel == "some updated channel"
       assert notification.content == "some updated content"
       assert notification.sent_at == ~U[2024-11-02 18:18:00Z]
@@ -47,7 +62,10 @@ defmodule Bankup.NotificationsTest do
 
     test "update_notification/2 with invalid data returns error changeset" do
       notification = notification_fixture()
-      assert {:error, %Ecto.Changeset{}} = Notifications.update_notification(notification, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Notifications.update_notification(notification, @invalid_attrs)
+
       assert notification == Notifications.get_notification!(notification.id)
     end
 

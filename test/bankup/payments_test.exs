@@ -8,7 +8,13 @@ defmodule Bankup.PaymentsTest do
 
     import Bankup.PaymentsFixtures
 
-    @invalid_attrs %{amount_paid: nil, payment_date: nil, payment_method: nil, payment_status: nil, penalty_applied: nil}
+    @invalid_attrs %{
+      amount_paid: nil,
+      payment_date: nil,
+      payment_method: nil,
+      payment_status: nil,
+      penalty_applied: nil
+    }
 
     test "list_payments/0 returns all payments" do
       payment = payment_fixture()
@@ -21,7 +27,13 @@ defmodule Bankup.PaymentsTest do
     end
 
     test "create_payment/1 with valid data creates a payment" do
-      valid_attrs = %{amount_paid: 42, payment_date: ~U[2024-11-01 18:17:00Z], payment_method: "some payment_method", payment_status: "some payment_status", penalty_applied: 42}
+      valid_attrs = %{
+        amount_paid: 42,
+        payment_date: ~U[2024-11-01 18:17:00Z],
+        payment_method: "some payment_method",
+        payment_status: "some payment_status",
+        penalty_applied: 42
+      }
 
       assert {:ok, %Payment{} = payment} = Payments.create_payment(valid_attrs)
       assert payment.amount_paid == 42
@@ -37,7 +49,14 @@ defmodule Bankup.PaymentsTest do
 
     test "update_payment/2 with valid data updates the payment" do
       payment = payment_fixture()
-      update_attrs = %{amount_paid: 43, payment_date: ~U[2024-11-02 18:17:00Z], payment_method: "some updated payment_method", payment_status: "some updated payment_status", penalty_applied: 43}
+
+      update_attrs = %{
+        amount_paid: 43,
+        payment_date: ~U[2024-11-02 18:17:00Z],
+        payment_method: "some updated payment_method",
+        payment_status: "some updated payment_status",
+        penalty_applied: 43
+      }
 
       assert {:ok, %Payment{} = payment} = Payments.update_payment(payment, update_attrs)
       assert payment.amount_paid == 43

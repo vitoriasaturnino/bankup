@@ -8,7 +8,19 @@ defmodule Bankup.ClientsTest do
 
     import Bankup.ClientsFixtures
 
-    @invalid_attrs %{state: nil, full_name: nil, cpf_cnpj: nil, email: nil, phone: nil, whatsapp: nil, country: nil, city: nil, postal_code: nil, street_address: nil, birth_date: nil}
+    @invalid_attrs %{
+      state: nil,
+      full_name: nil,
+      cpf_cnpj: nil,
+      email: nil,
+      phone: nil,
+      whatsapp: nil,
+      country: nil,
+      city: nil,
+      postal_code: nil,
+      street_address: nil,
+      birth_date: nil
+    }
 
     test "list_clients/0 returns all clients" do
       client = client_fixture()
@@ -21,7 +33,19 @@ defmodule Bankup.ClientsTest do
     end
 
     test "create_client/1 with valid data creates a client" do
-      valid_attrs = %{state: "some state", full_name: "some full_name", cpf_cnpj: "some cpf_cnpj", email: "some email", phone: "some phone", whatsapp: "some whatsapp", country: "some country", city: "some city", postal_code: "some postal_code", street_address: "some street_address", birth_date: ~D[2024-11-01]}
+      valid_attrs = %{
+        state: "some state",
+        full_name: "some full_name",
+        cpf_cnpj: "some cpf_cnpj",
+        email: "some email",
+        phone: "some phone",
+        whatsapp: "some whatsapp",
+        country: "some country",
+        city: "some city",
+        postal_code: "some postal_code",
+        street_address: "some street_address",
+        birth_date: ~D[2024-11-01]
+      }
 
       assert {:ok, %Client{} = client} = Clients.create_client(valid_attrs)
       assert client.state == "some state"
@@ -43,7 +67,20 @@ defmodule Bankup.ClientsTest do
 
     test "update_client/2 with valid data updates the client" do
       client = client_fixture()
-      update_attrs = %{state: "some updated state", full_name: "some updated full_name", cpf_cnpj: "some updated cpf_cnpj", email: "some updated email", phone: "some updated phone", whatsapp: "some updated whatsapp", country: "some updated country", city: "some updated city", postal_code: "some updated postal_code", street_address: "some updated street_address", birth_date: ~D[2024-11-02]}
+
+      update_attrs = %{
+        state: "some updated state",
+        full_name: "some updated full_name",
+        cpf_cnpj: "some updated cpf_cnpj",
+        email: "some updated email",
+        phone: "some updated phone",
+        whatsapp: "some updated whatsapp",
+        country: "some updated country",
+        city: "some updated city",
+        postal_code: "some updated postal_code",
+        street_address: "some updated street_address",
+        birth_date: ~D[2024-11-02]
+      }
 
       assert {:ok, %Client{} = client} = Clients.update_client(client, update_attrs)
       assert client.state == "some updated state"

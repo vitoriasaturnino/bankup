@@ -23,7 +23,31 @@ defmodule Bankup.Clients.Client do
   @doc false
   def changeset(client, attrs) do
     client
-    |> cast(attrs, [:full_name, :cpf_cnpj, :email, :phone, :whatsapp, :country, :state, :city, :postal_code, :street_address, :birth_date])
-    |> validate_required([:full_name, :cpf_cnpj, :email, :phone, :whatsapp, :country, :state, :city, :postal_code, :street_address, :birth_date])
+    |> cast(attrs, [
+      :full_name,
+      :cpf_cnpj,
+      :email,
+      :phone,
+      :whatsapp,
+      :country,
+      :state,
+      :city,
+      :postal_code,
+      :street_address,
+      :birth_date
+    ])
+    |> validate_required([
+      :full_name,
+      :cpf_cnpj,
+      :email,
+      :phone,
+      :whatsapp,
+      :country,
+      :state,
+      :city,
+      :postal_code,
+      :street_address,
+      :birth_date
+    ])
   end
 end

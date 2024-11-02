@@ -21,7 +21,11 @@ defmodule Bankup.SettingsTest do
     end
 
     test "create_setting/1 with valid data creates a setting" do
-      valid_attrs = %{notification_preference: "some notification_preference", penalty_limit: 42, reminder_frequency: 42}
+      valid_attrs = %{
+        notification_preference: "some notification_preference",
+        penalty_limit: 42,
+        reminder_frequency: 42
+      }
 
       assert {:ok, %Setting{} = setting} = Settings.create_setting(valid_attrs)
       assert setting.notification_preference == "some notification_preference"
@@ -35,7 +39,12 @@ defmodule Bankup.SettingsTest do
 
     test "update_setting/2 with valid data updates the setting" do
       setting = setting_fixture()
-      update_attrs = %{notification_preference: "some updated notification_preference", penalty_limit: 43, reminder_frequency: 43}
+
+      update_attrs = %{
+        notification_preference: "some updated notification_preference",
+        penalty_limit: 43,
+        reminder_frequency: 43
+      }
 
       assert {:ok, %Setting{} = setting} = Settings.update_setting(setting, update_attrs)
       assert setting.notification_preference == "some updated notification_preference"
