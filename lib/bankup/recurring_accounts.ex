@@ -1,6 +1,8 @@
 defmodule Bankup.RecurringAccounts do
   use Ecto.Schema
 
+  import Ecto.Query
+
   alias Bankup.Repo
   alias Bankup.RecurringAccounts.RecurringAccount
 
@@ -27,5 +29,11 @@ defmodule Bankup.RecurringAccounts do
   """
   def deactivate_recurring_account(%RecurringAccount{} = account) do
     update_recurring_account(account, %{status: "inativa"})
+  end
+
+  def list_accounts(client_id) do
+    RecurringAccount
+    |> where([a], a.client_id == ^client_id)
+    |> Repo.all()
   end
 end

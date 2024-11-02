@@ -17,8 +17,10 @@ defmodule Bankup.Notifications do
       [%Notification{}, ...]
 
   """
-  def list_notifications do
-    Repo.all(Notification)
+  def list_notifications(client_id) when is_binary(client_id) do
+    Notification
+    |> where([n], n.client_id == ^client_id)
+    |> Repo.all()
   end
 
   @doc """

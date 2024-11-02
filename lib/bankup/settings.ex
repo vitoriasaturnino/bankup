@@ -101,4 +101,16 @@ defmodule Bankup.Settings do
   def change_setting(%Setting{} = setting, attrs \\ %{}) do
     Setting.changeset(setting, attrs)
   end
+
+  # Função pública para obter as preferências de notificação de um cliente específico
+  def get_preferences(client_id) do
+    Repo.get_by(Setting, client_id: client_id)
+  end
+
+  # Função pública para atualizar a preferência de notificação de um cliente específico
+  def update_preference(%Setting{} = setting, attrs) do
+    setting
+    |> Setting.changeset(attrs)
+    |> Repo.update()
+  end
 end

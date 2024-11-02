@@ -4,14 +4,18 @@ defmodule BankupWeb.DashboardLive do
   alias Bankup.Payments
   alias Bankup.Notifications
 
-  def mount(_params, _session, socket) do
-    # Substituir pelo ID do cliente autenticado em um sistema real
-    client_id = 1
+  # Monta o Dashboard com client_id da sessão
+  def mount(_params, %{"client_id" => client_id} = _session, socket) do
     accounts = RecurringAccounts.list_accounts(client_id)
     payments = Payments.list_payments(client_id)
     notifications = Notifications.list_notifications(client_id)
 
     {:ok, assign(socket, accounts: accounts, payments: payments, notifications: notifications)}
+  end
+
+  # Lida com o caso em que client_id não está na sessão
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, accounts: [], payments: [], notifications: [])}
   end
 
   def render(assigns) do
@@ -23,7 +27,7 @@ defmodule BankupWeb.DashboardLive do
       <ul>
         <%= for account <- @accounts do %>
           <li>
-            <%= account.description %>: R$ <%= account.amount / 100 %> - Status: <%= account.status %>
+            <strong><%= account.description %></strong>: R$ <%= account.amount / 100 %> - Status: <%= account.status %>
           </li>
         <% end %>
       </ul>
@@ -34,7 +38,7 @@ defmodule BankupWeb.DashboardLive do
       <ul>
         <%= for payment <- @payments do %>
           <li>
-            <%= payment.description %> - Pago: R$ <%= payment.amount_paid / 100 %> - Status: <%= payment.payment_status %>
+            Conta: <%= payment.description %> - Pago: R$ <%= payment.amount_paid / 100 %> - Status: <%= payment.payment_status %>
           </li>
         <% end %>
       </ul>
@@ -44,7 +48,9 @@ defmodule BankupWeb.DashboardLive do
       <h2>Notificações</h2>
       <ul>
         <%= for notification <- @notifications do %>
-          <li><%= notification.content %> - Status: <%= notification.delivery_status %></li>
+          <li>
+            <%= notification.content %> - Status: <%= notification.delivery_status %>
+          </li>
         <% end %>
       </ul>
     </section>
