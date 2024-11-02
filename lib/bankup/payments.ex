@@ -1,6 +1,8 @@
 defmodule Bankup.Payments do
   use Ecto.Schema
 
+  import Ecto.Query
+
   alias Bankup.Repo
   alias Bankup.Payments.Payment
   alias Bankup.RecurringAccounts.RecurringAccount
@@ -38,5 +40,29 @@ defmodule Bankup.Payments do
   def calculate_penalty(amount) do
     # Calcula a multa com base na taxa fixa
     trunc(amount * @penalty_rate)
+  end
+
+  @doc """
+  Lista todos os pagamentos de um cliente, incluindo detalhes da conta e multa aplicada.
+  """
+  def list_payments(client_id) do
+    from(p in Payment,
+      join: r in assoc(p, :recurring_account),
+      where: r.client_id == ^client_id,
+      select: %{
+        payment_id: p.id,
+        description: r.description,
+        amount: r.amount,
+        amount_paid: p.amount_paid,
+        payment_date: p.payment_date,
+        payment_status: p.payment_status,
+        penalty_applied: p.penalty_applied,
+        due_date: r.due_date,
+        payee: r.payee,
+        status: r.status
+      },
+      order_by: [desc: p.payment_date]
+    )
+    |> Repo.all()
   end
 end
