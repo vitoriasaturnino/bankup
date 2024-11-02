@@ -1,104 +1,42 @@
 defmodule Bankup.Payments do
-  @moduledoc """
-  The Payments context.
-  """
+  use Ecto.Schema
 
-  import Ecto.Query, warn: false
   alias Bankup.Repo
-
   alias Bankup.Payments.Payment
+  alias Bankup.RecurringAccounts.RecurringAccount
+
+  # Exemplo de taxa de multa: 2% do valor da conta
+  @penalty_rate 0.02
 
   @doc """
-  Returns the list of payments.
-
-  ## Examples
-
-      iex> list_payments()
-      [%Payment{}, ...]
-
+  Aplica uma multa automática se a conta estiver em atraso.
   """
-  def list_payments do
-    Repo.all(Payment)
-  end
+  def apply_penalty_if_due(%RecurringAccount{} = account) do
+    # Verifica se a conta está em atraso
+    if Date.utc_today() > account.due_date do
+      penalty = calculate_penalty(account.amount)
 
-  @doc """
-  Gets a single payment.
-
-  Raises `Ecto.NoResultsError` if the Payment does not exist.
-
-  ## Examples
-
-      iex> get_payment!(123)
+      # Cria o pagamento com a multa aplicada
       %Payment{}
-
-      iex> get_payment!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_payment!(id), do: Repo.get!(Payment, id)
-
-  @doc """
-  Creates a payment.
-
-  ## Examples
-
-      iex> create_payment(%{field: value})
-      {:ok, %Payment{}}
-
-      iex> create_payment(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_payment(attrs \\ %{}) do
-    %Payment{}
-    |> Payment.changeset(attrs)
-    |> Repo.insert()
+      |> Payment.changeset(%{
+        account_id: account.id,
+        # Não pago ainda
+        amount_paid: 0,
+        payment_date: nil,
+        payment_status: "pendente",
+        penalty_applied: penalty
+      })
+      |> Repo.insert()
+    else
+      {:ok, "A conta não está vencida."}
+    end
   end
 
   @doc """
-  Updates a payment.
-
-  ## Examples
-
-      iex> update_payment(payment, %{field: new_value})
-      {:ok, %Payment{}}
-
-      iex> update_payment(payment, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Calcula a multa com base em uma taxa fixa e no valor da conta.
   """
-  def update_payment(%Payment{} = payment, attrs) do
-    payment
-    |> Payment.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a payment.
-
-  ## Examples
-
-      iex> delete_payment(payment)
-      {:ok, %Payment{}}
-
-      iex> delete_payment(payment)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_payment(%Payment{} = payment) do
-    Repo.delete(payment)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking payment changes.
-
-  ## Examples
-
-      iex> change_payment(payment)
-      %Ecto.Changeset{data: %Payment{}}
-
-  """
-  def change_payment(%Payment{} = payment, attrs \\ %{}) do
-    Payment.changeset(payment, attrs)
+  def calculate_penalty(amount) do
+    # Calcula a multa com base na taxa fixa
+    trunc(amount * @penalty_rate)
   end
 end
