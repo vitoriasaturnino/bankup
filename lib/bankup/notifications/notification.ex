@@ -4,6 +4,8 @@ defmodule Bankup.Notifications.Notification do
   alias Bankup.Clients.Client
   alias Bankup.RecurringAccounts.RecurringAccount
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "notifications" do
     field :channel, :string, default: "ambos"
     field :content, :string

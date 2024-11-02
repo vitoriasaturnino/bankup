@@ -2,8 +2,9 @@ defmodule Bankup.Repo.Migrations.CreateRecurringAccounts do
   use Ecto.Migration
 
   def change do
-    create table(:recurring_accounts) do
-      add :client_id, references(:clients, on_delete: :delete_all), null: false
+    create table(:recurring_accounts, primary_key: false) do
+      add :id, :uuid, primary_key: true, null: false
+      add :client_id, references(:clients, type: :binary_id), null: false
       add :description, :string, null: false
       # Armazenado em centavos
       add :amount, :integer, null: false

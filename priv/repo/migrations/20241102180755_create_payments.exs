@@ -2,8 +2,13 @@ defmodule Bankup.Repo.Migrations.CreatePayments do
   use Ecto.Migration
 
   def change do
-    create table(:payments) do
-      add :account_id, references(:recurring_accounts, on_delete: :delete_all), null: false
+    create table(:payments, primary_key: false) do
+      add :id, :uuid, primary_key: true, null: false
+
+      add :recurring_account_id,
+          references(:recurring_accounts, type: :binary_id, on_delete: :delete_all),
+          null: false
+
       add :amount_paid, :integer
       add :payment_date, :utc_datetime
       add :payment_method, :string, size: 20, default: "PIX"
@@ -12,6 +17,6 @@ defmodule Bankup.Repo.Migrations.CreatePayments do
       timestamps()
     end
 
-    create index(:payments, [:account_id])
+    create index(:payments, [:recurring_account_id])
   end
 end

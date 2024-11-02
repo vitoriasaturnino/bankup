@@ -3,6 +3,8 @@ defmodule Bankup.Payments.Payment do
   import Ecto.Changeset
   alias Bankup.RecurringAccounts.RecurringAccount
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "payments" do
     field :amount_paid, :integer
     field :payment_date, :utc_datetime

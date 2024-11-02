@@ -3,6 +3,8 @@ defmodule Bankup.RecurringAccounts.RecurringAccount do
   import Ecto.Changeset
   alias Bankup.Clients.Client
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "recurring_accounts" do
     field :description, :string
     field :amount, :integer
@@ -10,7 +12,7 @@ defmodule Bankup.RecurringAccounts.RecurringAccount do
     field :payee, :string
     field :pix_key, :string
     field :status, :string, default: "ativa"
-    belongs_to :client, Client
+    belongs_to :client, Client, type: :binary_id
 
     timestamps()
   end

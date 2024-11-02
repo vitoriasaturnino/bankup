@@ -2,7 +2,8 @@ defmodule Bankup.Repo.Migrations.CreateClients do
   use Ecto.Migration
 
   def change do
-    create table(:clients) do
+    create table(:clients, primary_key: false) do
+      add :id, :uuid, primary_key: true, null: false
       add :full_name, :string, null: false
       add :cpf_cnpj, :string, size: 14, null: false
       add :email, :string, null: false
