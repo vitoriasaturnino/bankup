@@ -101,4 +101,23 @@ defmodule Bankup.Clients do
   def change_client(%Client{} = client, attrs \\ %{}) do
     Client.changeset(client, attrs)
   end
+
+  @doc """
+  Verifica se o cliente acumula três meses consecutivos de não pagamento e bloqueia o acesso se necessário.
+  """
+  def check_for_block(client_id) do
+    client = Repo.get(Client, client_id)
+
+    if client.pending_billing > 0 and client.consecutive_non_payment_cycles >= 3 do
+      # Bloqueia o cliente
+      Repo.update_all(
+        from(c in Client, where: c.id == ^client_id),
+        set: [blocked: true]
+      )
+
+      {:error, "Acesso bloqueado após três meses de não pagamento"}
+    else
+      {:ok, "Cliente em situação regular"}
+    end
+  end
 end
