@@ -17,8 +17,8 @@ defmodule Bankup.Clients do
       [%Client{}, ...]
 
   """
-  def list_clients do
-    Repo.all(Client)
+  def list_clients(client_id) do
+    Repo.all(from(c in Client, where: c.id == ^client_id))
   end
 
   @doc """

@@ -18,7 +18,7 @@ defmodule Bankup.RecurringAccounts.RecurringAccount do
   end
 
   @doc false
-  def changeset(recurring_account, attrs) do
+  def changeset(recurring_account, attrs \\ %{}) do
     recurring_account
     |> cast(attrs, [:description, :amount, :due_date, :payee, :pix_key, :status, :client_id])
     |> validate_required([:description, :amount, :due_date, :payee, :status, :client_id])

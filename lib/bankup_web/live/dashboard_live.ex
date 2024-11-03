@@ -1,26 +1,42 @@
 defmodule BankupWeb.DashboardLive do
   use BankupWeb, :live_view
+  alias Bankup.Clients
   alias Bankup.RecurringAccounts
   alias Bankup.Payments
   alias Bankup.Notifications
 
-  # Monta o Dashboard com client_id da sessão
-  def mount(_params, %{"client_id" => client_id} = _session, socket) do
+  # Monta o Dashboard sem autenticação
+  def mount(_params, _session, socket) do
+    # Usar dados de um client_id fixo para simplificação
+    # Substitua com um ID válido para teste
+    client_id = "300401f4-0f42-4f25-b6ed-fb69464d2cd3"
+
+    clients = Clients.list_clients(client_id)
     accounts = RecurringAccounts.list_accounts(client_id)
     payments = Payments.list_payments(client_id)
     notifications = Notifications.list_notifications(client_id)
 
-    {:ok, assign(socket, accounts: accounts, payments: payments, notifications: notifications)}
-  end
-
-  # Lida com o caso em que client_id não está na sessão
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, accounts: [], payments: [], notifications: [])}
+    {:ok,
+     assign(socket,
+       clients: clients,
+       accounts: accounts,
+       payments: payments,
+       notifications: notifications
+     )}
   end
 
   def render(assigns) do
     ~H"""
     <h1>Dashboard</h1>
+
+    <section>
+      <h2>Clientes</h2>
+      <ul>
+        <%= for client <- @clients do %>
+          <li><%= client.full_name %></li>
+        <% end %>
+      </ul>
+    </section>
 
     <section>
       <h2>Contas Recorrentes</h2>

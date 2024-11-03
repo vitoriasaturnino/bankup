@@ -4,7 +4,7 @@ defmodule BankupWeb.NotificationSettingsLive do
 
   def mount(_params, _session, socket) do
     # Substituir pelo ID do cliente autenticado em um sistema real
-    client_id = 1
+    client_id = "300401f4-0f42-4f25-b6ed-fb69464d2cd3"
     settings = Settings.get_preferences(client_id)
     {:ok, assign(socket, settings: settings)}
   end
