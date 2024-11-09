@@ -10,6 +10,7 @@ defmodule Bankup.Application do
     children = [
       BankupWeb.Telemetry,
       Bankup.Repo,
+      {Oban, Application.fetch_env!(:bankup, Oban)},
       {DNSCluster, query: Application.get_env(:bankup, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Bankup.PubSub},
       # Start the Finch HTTP client for sending emails
