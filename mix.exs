@@ -59,7 +59,8 @@ defmodule Bankup.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:oban, "~> 2.17"}
+      {:oban, "~> 2.17"},
+      {:qr_code, "~> 3.1.0"}
     ]
   end
 

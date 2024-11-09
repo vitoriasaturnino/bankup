@@ -6,6 +6,10 @@ defmodule Bankup.RecurringAccounts do
   alias Bankup.Repo
   alias Bankup.RecurringAccounts.RecurringAccount
 
+  def get_account!(id) do
+    Repo.get!(RecurringAccount, id)
+  end
+
   @doc """
   Cria uma nova conta recorrente associada a um cliente.
   """
@@ -35,5 +39,16 @@ defmodule Bankup.RecurringAccounts do
     RecurringAccount
     |> where([a], a.client_id == ^client_id)
     |> Repo.all()
+  end
+
+  def mark_as_paid(account_id) do
+    account = Repo.get!(RecurringAccount, account_id)
+
+    account
+    |> Ecto.Changeset.change(
+      status: "pago",
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    )
+    |> Repo.update()
   end
 end

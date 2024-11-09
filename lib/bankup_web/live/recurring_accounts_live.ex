@@ -37,6 +37,18 @@ defmodule BankupWeb.RecurringAccountsLive do
     end
   end
 
+  # Evento para registrar o pagamento de uma conta
+  def handle_event("mark_as_paid", %{"account_id" => account_id}, socket) do
+    case RecurringAccounts.mark_as_paid(account_id) do
+      {:ok, _account} ->
+        accounts = RecurringAccounts.list_accounts(socket.assigns.client_id)
+        {:noreply, assign(socket, accounts: accounts)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to mark as paid: #{reason}")}
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -117,10 +129,25 @@ defmodule BankupWeb.RecurringAccountsLive do
           <div class="p-4 bg-white shadow rounded-lg">
             <h3 class="text-lg font-semibold text-zinc-800"><%= account.description %></h3>
             <p class="mt-2 text-sm text-zinc-600">
-              Valor: <span class="text-green-600">R$ <%= format_currency(account.amount / 100) %></span>
+              Valor:
+              <span class="text-green-600">R$ <%= format_currency(account.amount / 100) %></span>
             </p>
             <p class="text-sm text-zinc-600">Vencimento: <%= account.due_date %></p>
             <p class="text-sm text-zinc-600">Status: <%= account.status %></p>
+
+            <%= if account.status != "pago" do %>
+              <button
+                phx-click="mark_as_paid"
+                phx-value-account_id={account.id}
+                class="mt-4 bg-green-500 text-white py-1 px-4 rounded"
+              >
+                Pago
+              </button>
+            <% else %>
+              <span class="text-green-700 font-semibold">
+                Pago em <%= format_date(account.updated_at) %>
+              </span>
+            <% end %>
           </div>
         <% end %>
       </div>
@@ -142,5 +169,9 @@ defmodule BankupWeb.RecurringAccountsLive do
     amount
     |> Kernel./(100)
     |> :erlang.float_to_binary(decimals: 2)
+  end
+
+  defp format_date(date) do
+    Calendar.strftime(date, "%d/%m/%Y")
   end
 end
