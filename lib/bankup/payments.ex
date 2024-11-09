@@ -2,30 +2,35 @@ defmodule Bankup.Payments do
   use Ecto.Schema
 
   import Ecto.Query
-
   alias Bankup.Clients.Client
   alias Bankup.Payments.Payment
   alias Bankup.RecurringAccounts.RecurringAccount
   alias Bankup.Repo
 
-  # Exemplo de taxa de multa: 2% do valor da conta
+  # Taxas e configurações
   @penalty_rate 0.02
-  # Taxa de faturamento de 0,1%
   @billing_rate 0.001
 
+  # Função nova para listar todos os clientes com os campos id e name
+  @doc """
+  Lista todos os clientes com os campos `id` e `name`.
+  """
+  def list_clients do
+    from(c in Client, select: %{id: c.id, name: c.full_name})
+    |> Repo.all()
+  end
+
+  # Funções existentes
   @doc """
   Aplica uma multa automática se a conta estiver em atraso.
   """
   def apply_penalty_if_due(%RecurringAccount{} = account) do
-    # Verifica se a conta está em atraso
     if Date.utc_today() > account.due_date do
       penalty = calculate_penalty(account.amount)
 
-      # Cria o pagamento com a multa aplicada
       %Payment{}
       |> Payment.changeset(%{
         account_id: account.id,
-        # Não pago ainda
         amount_paid: 0,
         payment_date: nil,
         payment_status: "pendente",
@@ -41,7 +46,6 @@ defmodule Bankup.Payments do
   Calcula a multa com base em uma taxa fixa e no valor da conta.
   """
   def calculate_penalty(amount) do
-    # Calcula a multa com base na taxa fixa
     trunc(amount * @penalty_rate)
   end
 
@@ -70,11 +74,9 @@ defmodule Bankup.Payments do
   end
 
   @doc """
-  Calcula o faturamento mensal de um cliente com base no total movimentado
-  e acumula até atingir o mínimo de R$ 1,00.
+  Calcula o faturamento mensal de um cliente com base no total movimentado.
   """
   def calculate_monthly_billing(client_id) do
-    # Calcula o total movimentado pelo cliente no mês corrente
     total_moved =
       from(p in Payment,
         where:
@@ -85,17 +87,11 @@ defmodule Bankup.Payments do
       |> Repo.one()
       |> Kernel.||(0)
 
-    # Calcula o valor do faturamento com a taxa
     billing_amount = trunc(total_moved * @billing_rate)
-
-    # Busca o cliente e suas configurações para verificar o saldo pendente
     client = Repo.get(Client, client_id)
-
-    # Atualiza o saldo acumulado
     new_accumulated_balance = client.accumulated_balance + billing_amount
 
     if new_accumulated_balance >= 100 do
-      # Marca o faturamento como pendente para pagamento e reseta o saldo
       Repo.update_all(
         from(c in Client, where: c.id == ^client_id),
         set: [accumulated_balance: 0, pending_billing: new_accumulated_balance]
@@ -103,7 +99,6 @@ defmodule Bankup.Payments do
 
       {:ok, "Cobrança pendente gerada de #{new_accumulated_balance} centavos"}
     else
-      # Atualiza o saldo acumulado sem cobrança pendente
       Repo.update_all(
         from(c in Client, where: c.id == ^client_id),
         set: [accumulated_balance: new_accumulated_balance]
