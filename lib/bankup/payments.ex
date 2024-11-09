@@ -107,4 +107,10 @@ defmodule Bankup.Payments do
       {:ok, "Saldo acumulado atualizado para #{new_accumulated_balance} centavos"}
     end
   end
+
+  def create_payment(attrs) do
+    %Payment{}
+    |> Payment.changeset(attrs)
+    |> Repo.insert()
+  end
 end

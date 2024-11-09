@@ -20,14 +20,14 @@ defmodule Bankup.Payments.Payment do
   def changeset(payment, attrs) do
     payment
     |> cast(attrs, [
-      :account_id,
+      :recurring_account_id,
       :amount_paid,
       :payment_date,
       :payment_method,
       :payment_status,
       :penalty_applied
     ])
-    |> validate_required([:account_id, :payment_status])
+    |> validate_required([:recurring_account_id, :payment_status])
     |> validate_inclusion(:payment_status, ["pendente", "concluído", "falhou"])
     |> assoc_constraint(:recurring_account)
   end

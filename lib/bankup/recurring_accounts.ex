@@ -38,11 +38,12 @@ defmodule Bankup.RecurringAccounts do
   def list_accounts(client_id) do
     RecurringAccount
     |> where([a], a.client_id == ^client_id)
+    |> preload(:payments)
     |> Repo.all()
   end
 
   def mark_as_paid(account_id) do
-    account = Repo.get!(RecurringAccount, account_id)
+    account = Repo.get!(RecurringAccount, account_id) |> preload(:payments)
 
     account
     |> Ecto.Changeset.change(
@@ -50,5 +51,16 @@ defmodule Bankup.RecurringAccounts do
       updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     )
     |> Repo.update()
+  end
+
+  def list_accounts() do
+    RecurringAccount
+    |> preload(:payments)
+    |> Repo.all()
+  end
+
+  def get_account_amount(account_id) do
+    account = Repo.get!(RecurringAccount, account_id)
+    account.amount
   end
 end

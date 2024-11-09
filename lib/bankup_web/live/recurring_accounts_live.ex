@@ -2,35 +2,25 @@ defmodule BankupWeb.RecurringAccountsLive do
   use BankupWeb, :live_view
   alias Bankup.RecurringAccounts
   alias Bankup.RecurringAccounts.RecurringAccount
+  alias Bankup.Payments
   import Ecto.Changeset, only: [get_field: 2]
 
   def mount(_params, _session, socket) do
-    # Simulação de cliente autenticado
-    client_id = "300401f4-0f42-4f25-b6ed-fb69464d2cd3"
-    accounts = RecurringAccounts.list_accounts(client_id)
-
+    accounts = RecurringAccounts.list_accounts()
     changeset = RecurringAccount.changeset(%RecurringAccount{})
 
     {:ok,
      assign(socket,
        accounts: accounts,
-       changeset: changeset,
-       client_id: client_id
+       changeset: changeset
      )}
   end
 
   def handle_event("save", %{"recurring_account" => account_params}, socket) do
-    account_params = Map.put(account_params, "client_id", socket.assigns.client_id)
-
     case RecurringAccounts.create_recurring_account(account_params) do
       {:ok, _account} ->
-        accounts = RecurringAccounts.list_accounts(socket.assigns.client_id)
-
-        {:noreply,
-         assign(socket,
-           accounts: accounts,
-           changeset: RecurringAccount.changeset(%RecurringAccount{})
-         )}
+        accounts = RecurringAccounts.list_accounts()
+        {:noreply, assign(socket, accounts: accounts, changeset: RecurringAccount.changeset(%RecurringAccount{}))}
 
       {:error, changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
@@ -39,9 +29,15 @@ defmodule BankupWeb.RecurringAccountsLive do
 
   # Evento para registrar o pagamento de uma conta
   def handle_event("mark_as_paid", %{"account_id" => account_id}, socket) do
-    case RecurringAccounts.mark_as_paid(account_id) do
-      {:ok, _account} ->
-        accounts = RecurringAccounts.list_accounts(socket.assigns.client_id)
+    case Payments.create_payment(%{
+      amount_paid: RecurringAccounts.get_account_amount(account_id),
+      payment_date: DateTime.utc_now(),
+      payment_status: "concluído",
+      penalty_applied: 0,
+      recurring_account_id: account_id
+    }) do
+      {:ok, _payment} ->
+        accounts = RecurringAccounts.list_accounts()
         {:noreply, assign(socket, accounts: accounts)}
 
       {:error, reason} ->
@@ -133,20 +129,21 @@ defmodule BankupWeb.RecurringAccountsLive do
               <span class="text-green-600">R$ <%= format_currency(account.amount / 100) %></span>
             </p>
             <p class="text-sm text-zinc-600">Vencimento: <%= account.due_date %></p>
-            <p class="text-sm text-zinc-600">Status: <%= account.status %></p>
 
-            <%= if account.status != "pago" do %>
-              <button
-                phx-click="mark_as_paid"
-                phx-value-account_id={account.id}
-                class="mt-4 bg-green-500 text-white py-1 px-4 rounded"
-              >
-                Pago
-              </button>
-            <% else %>
-              <span class="text-green-700 font-semibold">
-                Pago em <%= format_date(account.updated_at) %>
-              </span>
+            <!-- Verifica se há algum pagamento concluído para esta conta -->
+            <%= case Enum.find(account.payments, &(&1.payment_status == "concluído")) do %>
+              <% nil -> %>
+                <button
+                  phx-click="mark_as_paid"
+                  phx-value-account_id={account.id}
+                  class="mt-4 bg-green-500 text-white py-1 px-4 rounded"
+                >
+                  Marcar como Pago
+                </button>
+              <% last_payment -> %>
+                <span class="text-green-700 font-semibold">
+                  Pago em <%= format_date(last_payment.payment_date) %>
+                </span>
             <% end %>
           </div>
         <% end %>
