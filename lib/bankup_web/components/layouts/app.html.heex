@@ -1,49 +1,49 @@
-<header class="px-4 sm:px-6 lg:px-8 border-b border-zinc-100 bg-white shadow-md">
-  <div class="flex items-center justify-between py-4">
-    <!-- Logotipo -->
-    <div class="flex items-center gap-4">
-      <a href="/dashboard" class="flex items-center">
-        <img src={~p"/images/logo.svg"} width="36" alt="Bankup Logo" />
-        <span class="ml-2 text-lg font-semibold text-zinc-900">Bankup</span>
-      </a>
-    </div>
+<header class="border-b bg-white/70 backdrop-blur-lg shadow-lg">
+  <div class="max-w-7xl mx-auto px-10 sm:px-12 lg:px-16">
+    <div class="flex items-center justify-between py-6">
+      <!-- Logotipo -->
+      <div class="flex items-center gap-6">
+        <a href="/" class="flex items-center">
+          <span class="ml-2 text-xl font-semibold text-[#007f3b]">Bankup</span> <!-- Verde Apple -->
+        </a>
+      </div>
 
-    <!-- Links de Navegação -->
-    <nav class="hidden md:flex items-center gap-6 text-zinc-900 font-medium">
-      <a href={~p"/dashboard"} class="hover:text-zinc-700">Dashboard</a>
-      <a href={~p"/contas-recorrentes"} class="hover:text-zinc-700">Contas Recorrentes</a>
-      <a href={~p"/historico-pagamentos"} class="hover:text-zinc-700">Histórico de Pagamentos</a>
-      <a href={~p"/configuracoes-notificacoes"} class="hover:text-zinc-700">Configurações</a>
-    </nav>
+      <!-- Links de Navegação -->
+      <nav class="hidden md:flex items-center gap-10 text-gray-800 font-medium">
+        <a href={~p"/contas-recorrentes"} class="hover:text-[#007f3b] transition duration-200">Contas Recorrentes</a>
+        <a href={~p"/historico-pagamentos"} class="hover:text-[#007f3b] transition duration-200">Histórico de Pagamentos</a>
+        <a href={~p"/configuracoes-notificacoes"} class="hover:text-[#007f3b] transition duration-200">Configurações</a>
+      </nav>
 
-    <!-- Botão para Visualização em Dispositivos Móveis -->
-    <div class="flex md:hidden">
-      <button
-        id="menu-button"
-        class="text-zinc-900 hover:text-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-      >
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
+      <!-- Botão para Visualização em Dispositivos Móveis -->
+      <div class="flex md:hidden">
+        <button
+          id="menu-button"
+          class="text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#007f3b]"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Menu Mobile -->
-  <div class="md:hidden" id="mobile-menu">
-    <nav class="flex flex-col items-start px-4 pt-2 pb-4 text-zinc-900 font-medium border-t border-zinc-100">
-      <a href={~p"/"} class="py-2 hover:text-zinc-700">Home</a>
-      <a href={~p"/dashboard"} class="py-2 hover:text-zinc-700">Dashboard</a>
-      <a href={~p"/contas-recorrentes"} class="py-2 hover:text-zinc-700">Contas Recorrentes</a>
-      <a href={~p"/historico-pagamentos"} class="py-2 hover:text-zinc-700">Histórico de Pagamentos</a>
-      <a href={~p"/configuracoes-notificacoes"} class="py-2 hover:text-zinc-700">Configurações</a>
+  <div class="md:hidden bg-white/70 backdrop-blur-lg text-gray-800" id="mobile-menu">
+    <nav class="flex flex-col items-start px-4 pt-2 pb-4 border-t border-gray-200">
+      <a href={~p"/"} class="py-2 hover:text-[#007f3b]">Home</a>
+      <a href={~p"/contas-recorrentes"} class="py-2 hover:text-[#007f3b]">Contas Recorrentes</a>
+      <a href={~p"/historico-pagamentos"} class="py-2 hover:text-[#007f3b]">Histórico de Pagamentos</a>
+      <a href={~p"/configuracoes-notificacoes"} class="py-2 hover:text-[#007f3b]">Configurações</a>
     </nav>
   </div>
 </header>
-<main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
+
+<main class="px-10 py-20 sm:px-12 lg:px-16 bg-gray-50 min-h-screen">
+  <div>
     <.flash_group flash={@flash} />
     <%= @inner_content %>
   </div>

@@ -19,32 +19,36 @@ defmodule BankupWeb.PaymentsHistoryLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-semibold text-green-600 mb-6">Histórico de Pagamentos</h1>
-      <!-- Exibe os pagamentos agrupados por cliente -->
+    <div class="mx-auto max-w-6xl px-10 py-12 bg-gradient-to-b from-white to-gray-100 shadow-2xl rounded-3xl">
+      <h1 class="text-4xl font-semibold text-green-600 mb-10 tracking-tight">
+        Histórico de Pagamentos
+      </h1>
+      <!-- Pagamentos Agrupados por Cliente -->
       <%= for {client_name, payments} <- @payments_by_client do %>
-        <div class="mb-8">
-          <h2 class="text-2xl font-semibold text-blue-600 mb-4"><%= client_name %></h2>
+        <div class="mb-12">
+          <h2 class="text-3xl font-semibold text-zinc-900 mb-6 tracking-tight"><%= client_name %></h2>
 
-          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <%= if payments == [] do %>
-              <!-- Exibe mensagem para clientes sem contas pagas -->
-              <p class="text-sm text-zinc-600">Sem contas pagas por enquanto</p>
+              <!-- Mensagem para Clientes sem Contas Pagas -->
+              <p class="text-lg text-zinc-500 italic">Sem contas pagas por enquanto</p>
             <% else %>
-              <!-- Exibe cartões de pagamentos para clientes com contas pagas -->
+              <!-- Cartões de Pagamentos -->
               <%= for payment <- payments do %>
-                <div class="p-4 bg-white shadow rounded-lg">
-                  <h3 class="text-lg font-semibold text-zinc-800"><%= payment.description %></h3>
-                  <p class="mt-2 text-sm text-zinc-600">
+                <div class="p-6 bg-white shadow-xl rounded-lg transition-transform transform hover:scale-105 hover:shadow-2xl">
+                  <h3 class="text-2xl font-medium text-zinc-800 mb-4"><%= payment.description %></h3>
+                  <p class="text-md text-zinc-600 mb-1">
                     Pago:
-                    <span class="text-green-600">R$ <%= format_currency(payment.amount_paid) %></span>
+                    <span class="text-green-600 font-semibold">
+                      R$ <%= format_currency(payment.amount_paid) %>
+                    </span>
                   </p>
-                  <p class="text-sm text-zinc-600">
-                    Status: <%= payment.payment_status %>
+                  <p class="text-md text-zinc-600 mb-1">
+                    Status: <span class="font-medium"><%= payment.payment_status %></span>
                   </p>
-                  <p class="text-sm text-zinc-600">
+                  <p class="text-md text-zinc-600">
                     Multa:
-                    <span class="text-red-500">
+                    <span class="text-red-500 font-semibold">
                       R$ <%= format_currency(payment.penalty_applied) %>
                     </span>
                   </p>

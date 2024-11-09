@@ -17,10 +17,8 @@ defmodule BankupWeb.Router do
   scope "/", BankupWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-
     # Rotas para LiveViews
-    live "/dashboard", DashboardLive
+    live "/", DashboardLive
     live "/contas-recorrentes", RecurringAccountsLive
     live "/historico-pagamentos", PaymentsHistoryLive
     live "/configuracoes-notificacoes", NotificationSettingsLive
