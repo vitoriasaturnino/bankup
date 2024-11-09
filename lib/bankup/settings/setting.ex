@@ -17,7 +17,7 @@ defmodule Bankup.Settings.Setting do
   @doc false
   def changeset(setting, attrs) do
     setting
-    |> cast(attrs, [:notification_preference, :penalty_limit, :reminder_frequency])
+    |> cast(attrs, [:client_id, :notification_preference, :penalty_limit, :reminder_frequency])
     |> validate_required([:notification_preference, :penalty_limit, :reminder_frequency])
   end
 end

@@ -6,12 +6,11 @@ defmodule BankupWeb.DashboardLive do
   alias Bankup.Notifications
 
   def mount(_params, _session, socket) do
-    client_id = "300401f4-0f42-4f25-b6ed-fb69464d2cd3"
-
-    clients = Clients.list_clients(client_id)
-    accounts = RecurringAccounts.list_accounts(client_id)
-    payments = Payments.list_payments(client_id)
-    notifications = Notifications.list_notifications(client_id)
+    # Remove a limitação de client_id e busca todas as informações
+    clients = Clients.list_all_clients()
+    accounts = RecurringAccounts.list_accounts()
+    payments = Payments.list_all_payments()
+    notifications = Notifications.list_all_notifications()
 
     {:ok,
      assign(socket,
@@ -24,12 +23,12 @@ defmodule BankupWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-7xl px-8 py-12">
+    <div class="mx-auto max-w-7xl px-10 py-16">
       <h1 class="text-5xl font-semibold text-zinc-900 mb-12 tracking-tight">Dashboard</h1>
       <!-- Grid Responsiva com Duas Colunas, Espaçamento Ampliado -->
       <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <!-- Clientes -->
-        <section class="bg-white shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105 bg-gradient-to-br from-green-100 to-green-200">
+        <section class="bg-gradient-to-br from-green-100 to-green-200 shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105">
           <h2 class="text-2xl font-semibold text-zinc-900 mb-6">Clientes</h2>
           <ul class="space-y-6">
             <%= for client <- @clients do %>
@@ -40,7 +39,7 @@ defmodule BankupWeb.DashboardLive do
           </ul>
         </section>
         <!-- Contas Recorrentes -->
-        <section class="bg-white shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105 bg-gradient-to-br from-green-100 to-green-200">
+        <section class="bg-gradient-to-br from-green-100 to-green-200 shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105">
           <h2 class="text-2xl font-semibold text-zinc-900 mb-6">Contas Recorrentes</h2>
           <ul class="space-y-6">
             <%= for account <- @accounts do %>
@@ -55,7 +54,7 @@ defmodule BankupWeb.DashboardLive do
           </ul>
         </section>
         <!-- Pagamentos Recentes -->
-        <section class="bg-white shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105 bg-gradient-to-br from-green-100 to-green-200">
+        <section class="bg-gradient-to-br from-green-100 to-green-200 shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105">
           <h2 class="text-2xl font-semibold text-zinc-900 mb-6">Pagamentos Recentes</h2>
           <ul class="space-y-6">
             <%= for payment <- @payments do %>
@@ -72,7 +71,7 @@ defmodule BankupWeb.DashboardLive do
           </ul>
         </section>
         <!-- Notificações -->
-        <section class="bg-white shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105 bg-gradient-to-br from-green-100 to-green-200">
+        <section class="bg-gradient-to-br from-green-100 to-green-200 shadow-lg rounded-2xl p-8 transition-transform duration-200 hover:scale-105">
           <h2 class="text-2xl font-semibold text-zinc-900 mb-6">Notificações</h2>
           <ul class="space-y-6">
             <%= for notification <- @notifications do %>

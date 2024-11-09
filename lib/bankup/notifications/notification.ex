@@ -20,8 +20,8 @@ defmodule Bankup.Notifications.Notification do
   @doc false
   def changeset(notification, attrs) do
     notification
-    |> cast(attrs, [:client_id, :account_id, :channel, :content, :sent_at, :delivery_status])
-    |> validate_required([:client_id, :account_id, :channel, :content, :delivery_status])
+    |> cast(attrs, [:client_id, :recurring_account_id, :channel, :content, :sent_at, :delivery_status])
+    |> validate_required([:client_id, :recurring_account_id, :channel, :content, :delivery_status])
     |> assoc_constraint(:client)
     |> assoc_constraint(:recurring_account)
   end

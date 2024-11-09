@@ -113,4 +113,24 @@ defmodule Bankup.Payments do
     |> Payment.changeset(attrs)
     |> Repo.insert()
   end
+
+  def list_all_payments() do
+    from(p in Payment,
+      join: r in assoc(p, :recurring_account),
+      select: %{
+        payment_id: p.id,
+        description: r.description,
+        amount: r.amount,
+        amount_paid: p.amount_paid,
+        payment_date: p.payment_date,
+        payment_status: p.payment_status,
+        penalty_applied: p.penalty_applied,
+        due_date: r.due_date,
+        payee: r.payee,
+        status: r.status
+      },
+      order_by: [desc: p.payment_date]
+    )
+    |> Repo.all()
+  end
 end

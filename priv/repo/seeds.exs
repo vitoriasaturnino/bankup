@@ -5,9 +5,9 @@ alias Bankup.Payments.Payment
 alias Bankup.Notifications.Notification
 alias Bankup.Settings.Setting
 
-# Populando a tabela clients com dados de exemplo
-clients = [
-  %Client{
+# Lista de clientes com dados de exemplo
+clients_data = [
+  %{
     full_name: "João da Silva",
     cpf_cnpj: "12345678901",
     email: "joao.silva@example.com",
@@ -20,7 +20,7 @@ clients = [
     street_address: "Rua Exemplo, 123",
     birth_date: ~D[1985-07-20]
   },
-  %Client{
+  %{
     full_name: "Maria Oliveira",
     cpf_cnpj: "12345678902",
     email: "maria.oliveira@example.com",
@@ -33,7 +33,7 @@ clients = [
     street_address: "Avenida Central, 456",
     birth_date: ~D[1990-03-15]
   },
-  %Client{
+  %{
     full_name: "Carlos Pereira",
     cpf_cnpj: "12345678903",
     email: "carlos.pereira@example.com",
@@ -48,100 +48,101 @@ clients = [
   }
 ]
 
-# Inserindo cada cliente no banco de dados
-Enum.each(clients, fn client ->
-  Repo.insert!(client)
+# Inserindo clientes e suas configurações
+Enum.each(clients_data, fn client_data ->
+  case Repo.insert(%Client{} |> Client.changeset(client_data)) do
+    {:ok, client} ->
+      # Cria configuração para cada cliente inserido com sucesso
+      %Setting{}
+      |> Setting.changeset(%{
+        client_id: client.id,
+        notification_preference: "ambos",
+        penalty_limit: 500,
+        reminder_frequency: 7
+      })
+      |> Repo.insert!()
+
+    {:error, changeset} ->
+      IO.puts("Erro ao inserir cliente: #{inspect(changeset.errors)}")
+  end
 end)
 
-# Recuperando o primeiro cliente para associações
+# Recuperando o cliente "João da Silva" para associações adicionais
 client = Repo.get_by(Client, cpf_cnpj: "12345678901")
 
-# Seed de Configurações de Notificação
-%Setting{}
-|> Setting.changeset(%{
-  client_id: client.id,
-  notification_preference: "ambos",
-  # Limite de multa em centavos
-  penalty_limit: 500,
-  # Lembrete a cada 7 dias
-  reminder_frequency: 7
-})
-|> Repo.insert!()
+# Criação de Contas Recorrentes e Pagamentos
+if client do
+  account_rent =
+    %RecurringAccount{}
+    |> RecurringAccount.changeset(%{
+      client_id: client.id,
+      description: "Aluguel",
+      # R$ 1.500,00 em centavos
+      amount: 150_000,
+      due_date: ~D[2024-11-05],
+      payee: "Imobiliária Exemplo",
+      pix_key: "example@pix.com",
+      status: "ativa"
+    })
+    |> Repo.insert!()
 
-# Seed de Contas Recorrentes
-account_rent =
-  %RecurringAccount{}
-  |> RecurringAccount.changeset(%{
-    client_id: client.id,
-    description: "Aluguel",
-    # R$ 1.500,00 em centavos
-    amount: 150_000,
-    due_date: ~D[2024-11-05],
-    payee: "Imobiliária Exemplo",
-    pix_key: "example@pix.com",
-    status: "ativa"
+  account_water =
+    %RecurringAccount{}
+    |> RecurringAccount.changeset(%{
+      client_id: client.id,
+      description: "Conta de Água",
+      # R$ 70,00 em centavos
+      amount: 7000,
+      due_date: ~D[2024-11-10],
+      payee: "SABESP",
+      pix_key: "agua@pix.com",
+      status: "ativa"
+    })
+    |> Repo.insert!()
+
+  # Pagamentos para as contas recorrentes
+  %Payment{}
+  |> Payment.changeset(%{
+    recurring_account_id: account_rent.id,
+    amount_paid: 150_000,
+    payment_date: ~U[2024-11-04 15:30:00Z],
+    payment_method: "PIX",
+    payment_status: "concluído",
+    penalty_applied: 0
   })
   |> Repo.insert!()
 
-account_water =
-  %RecurringAccount{}
-  |> RecurringAccount.changeset(%{
-    client_id: client.id,
-    description: "Conta de Água",
-    # R$ 70,00 em centavos
-    amount: 7000,
-    due_date: ~D[2024-11-10],
-    payee: "SABESP",
-    pix_key: "agua@pix.com",
-    status: "ativa"
+  %Payment{}
+  |> Payment.changeset(%{
+    recurring_account_id: account_water.id,
+    amount_paid: 0,
+    payment_status: "pendente",
+    penalty_applied: 200
   })
   |> Repo.insert!()
 
-# Seed de Pagamentos para as contas recorrentes
-%Payment{}
-|> Payment.changeset(%{
-  recurring_account_id: account_rent.id,
-  # Pago integralmente
-  amount_paid: 150_000,
-  payment_date: ~U[2024-11-04 15:30:00Z],
-  payment_method: "PIX",
-  payment_status: "concluído",
-  penalty_applied: 0
-})
-|> Repo.insert!()
+  # Notificações para o cliente e suas contas
+  %Notification{}
+  |> Notification.changeset(%{
+    client_id: client.id,
+    recurring_account_id: account_rent.id,
+    channel: "ambos",
+    content: "Seu aluguel vence amanhã. Pague com o QR code anexado.",
+    sent_at: ~U[2024-11-04 09:00:00Z],
+    delivery_status: "enviado"
+  })
+  |> Repo.insert!()
 
-%Payment{}
-|> Payment.changeset(%{
-  recurring_account_id: account_water.id,
-  # Ainda não pago
-  amount_paid: 0,
-  payment_status: "pendente",
-  # Multa de R$ 2,00
-  penalty_applied: 200
-})
-|> Repo.insert!()
-
-# Seed de Notificações para o cliente e suas contas
-%Notification{}
-|> Notification.changeset(%{
-  client_id: client.id,
-  recurring_account_id: account_rent.id,
-  channel: "ambos",
-  content: "Seu aluguel vence amanhã. Pague com o QR code anexado.",
-  sent_at: ~U[2024-11-04 09:00:00Z],
-  delivery_status: "enviado"
-})
-|> Repo.insert!()
-
-%Notification{}
-|> Notification.changeset(%{
-  client_id: client.id,
-  recurring_account_id: account_water.id,
-  channel: "ambos",
-  content: "Sua conta de água está em atraso.",
-  sent_at: ~U[2024-11-11 10:00:00Z],
-  delivery_status: "enviado"
-})
-|> Repo.insert!()
+  %Notification{}
+  |> Notification.changeset(%{
+    client_id: client.id,
+    recurring_account_id: account_water.id,
+    channel: "ambos",
+    content: "Sua conta de água está em atraso.",
+    sent_at: ~U[2024-11-11 10:00:00Z],
+    delivery_status: "enviado"
+  })
+  |> Repo.insert!()
+end
 
 IO.puts("Dados de exemplo inseridos com sucesso.")

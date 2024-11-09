@@ -120,4 +120,8 @@ defmodule Bankup.Clients do
       {:ok, "Cliente em situação regular"}
     end
   end
+
+  def list_all_clients() do
+    Repo.all(Client) |> Repo.preload(:setting)
+  end
 end

@@ -103,4 +103,9 @@ defmodule Bankup.Notifications do
   def change_notification(%Notification{} = notification, attrs \\ %{}) do
     Notification.changeset(notification, attrs)
   end
+
+  def list_all_notifications() do
+    Notification
+    |> Repo.all()
+  end
 end

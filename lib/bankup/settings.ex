@@ -7,6 +7,7 @@ defmodule Bankup.Settings do
   alias Bankup.Repo
 
   alias Bankup.Settings.Setting
+  alias Bankup.Clients.Client
 
   @doc """
   Returns the list of settings.
@@ -18,7 +19,7 @@ defmodule Bankup.Settings do
 
   """
   def list_settings do
-    Repo.all(Setting)
+    Repo.all(Setting) |> Repo.preload(:client)
   end
 
   @doc """
@@ -111,6 +112,12 @@ defmodule Bankup.Settings do
   def update_preference(%Setting{} = setting, attrs) do
     setting
     |> Setting.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def update_client_preference(%Client{} = client, attrs) do
+    client
+    |> Client.changeset(attrs)
     |> Repo.update()
   end
 end
