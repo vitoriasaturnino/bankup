@@ -35,7 +35,7 @@ defmodule Bankup.Clients do
       ** (Ecto.NoResultsError)
 
   """
-  def get_client!(id), do: Repo.get!(Client, id)
+  def get_client!(id), do: Repo.get!(Client, id) |> Repo.preload(:setting)
 
   @doc """
   Creates a client.

@@ -8,7 +8,8 @@ defmodule Bankup.Settings.Setting do
     field :notification_preference, :string
     field :penalty_limit, :integer
     field :reminder_frequency, :integer
-    field :client_id, :binary_id
+
+    belongs_to :client,Bankup.Clients.Client, type: :binary_id
 
     timestamps(type: :utc_datetime)
   end

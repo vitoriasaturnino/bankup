@@ -17,6 +17,11 @@ defmodule Bankup.Clients.Client do
     field :street_address, :string
     field :birth_date, :date
 
+    has_many :recurring_accounts, Bankup.RecurringAccounts.RecurringAccount
+    has_many :payments, Bankup.Payments.Payment
+    has_many :notifications, Bankup.Notifications.Notification
+    has_one :setting, Bankup.Settings.Setting
+
     timestamps(type: :utc_datetime)
   end
 

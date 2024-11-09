@@ -64,7 +64,13 @@ config :phoenix, :json_library, Jason
 config :bankup, Oban,
   engine: Oban.Engines.Basic,
   queues: [default: 10],
-  repo: Bankup.Repo
+  repo: Bankup.Repo,
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"0 8 * * *", Bankup.Notifications.DueNotifier}
+     ]}
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

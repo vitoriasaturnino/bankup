@@ -57,19 +57,21 @@ end)
 client = Repo.get_by(Client, cpf_cnpj: "12345678901")
 
 # Seed de Configurações de Notificação
-%Setting{
+%Setting{}
+|> Setting.changeset(%{
   client_id: client.id,
   notification_preference: "ambos",
   # Limite de multa em centavos
   penalty_limit: 500,
   # Lembrete a cada 7 dias
   reminder_frequency: 7
-}
+})
 |> Repo.insert!()
 
 # Seed de Contas Recorrentes
 account_rent =
-  %RecurringAccount{
+  %RecurringAccount{}
+  |> RecurringAccount.changeset(%{
     client_id: client.id,
     description: "Aluguel",
     # R$ 1.500,00 em centavos
@@ -78,11 +80,12 @@ account_rent =
     payee: "Imobiliária Exemplo",
     pix_key: "example@pix.com",
     status: "ativa"
-  }
+  })
   |> Repo.insert!()
 
 account_water =
-  %RecurringAccount{
+  %RecurringAccount{}
+  |> RecurringAccount.changeset(%{
     client_id: client.id,
     description: "Conta de Água",
     # R$ 70,00 em centavos
@@ -91,11 +94,12 @@ account_water =
     payee: "SABESP",
     pix_key: "agua@pix.com",
     status: "ativa"
-  }
+  })
   |> Repo.insert!()
 
 # Seed de Pagamentos para as contas recorrentes
-%Payment{
+%Payment{}
+|> Payment.changeset(%{
   recurring_account_id: account_rent.id,
   # Pago integralmente
   amount_paid: 150_000,
@@ -103,36 +107,41 @@ account_water =
   payment_method: "PIX",
   payment_status: "concluído",
   penalty_applied: 0
-}
+})
 |> Repo.insert!()
 
-%Payment{
+%Payment{}
+|> Payment.changeset(%{
   recurring_account_id: account_water.id,
   # Ainda não pago
   amount_paid: 0,
   payment_status: "pendente",
   # Multa de R$ 2,00
   penalty_applied: 200
-}
+})
 |> Repo.insert!()
 
 # Seed de Notificações para o cliente e suas contas
-%Notification{
+%Notification{}
+|> Notification.changeset(%{
   client_id: client.id,
   recurring_account_id: account_rent.id,
   channel: "ambos",
   content: "Seu aluguel vence amanhã. Pague com o QR code anexado.",
   sent_at: ~U[2024-11-04 09:00:00Z],
   delivery_status: "enviado"
-}
+})
 |> Repo.insert!()
 
-%Notification{
+%Notification{}
+|> Notification.changeset(%{
   client_id: client.id,
   recurring_account_id: account_water.id,
   channel: "ambos",
   content: "Sua conta de água está em atraso.",
   sent_at: ~U[2024-11-11 10:00:00Z],
   delivery_status: "enviado"
-}
+})
 |> Repo.insert!()
+
+IO.puts("Dados de exemplo inseridos com sucesso.")

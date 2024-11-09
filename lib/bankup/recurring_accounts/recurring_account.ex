@@ -12,7 +12,10 @@ defmodule Bankup.RecurringAccounts.RecurringAccount do
     field :payee, :string
     field :pix_key, :string
     field :status, :string, default: "ativa"
+
     belongs_to :client, Client, type: :binary_id
+    has_many :payments, Bankup.Payments.Payment
+    has_many :notifications, Bankup.Notifications.Notification
 
     timestamps()
   end
