@@ -8,15 +8,18 @@ defmodule BankupWeb.RecurringAccountsLive do
   def mount(_params, _session, socket) do
     accounts = RecurringAccounts.list_accounts()
     changeset = RecurringAccount.changeset(%RecurringAccount{})
+    client = Bankup.Clients.list_all_clients |> List.first()
 
     {:ok,
      assign(socket,
        accounts: accounts,
-       changeset: changeset
+       changeset: changeset,
+       client: client
      )}
   end
 
   def handle_event("save", %{"recurring_account" => account_params}, socket) do
+    account_params = Map.put(account_params, "client_id", socket.assigns.client.id)
     case RecurringAccounts.create_recurring_account(account_params) do
       {:ok, _account} ->
         accounts = RecurringAccounts.list_accounts()
