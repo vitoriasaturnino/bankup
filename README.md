@@ -30,7 +30,7 @@ Além disso, certifique-se de ter o **PostgreSQL** configurado e em execução p
 Clone o repositório do Bankup:
 
 ```bash
-git clone https://github.com/seu_usuario/bankup.git
+git clone https://github.com/vitoriasaturnino/bankup.git
 cd bankup
 ```
 
